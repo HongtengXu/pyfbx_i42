@@ -30,6 +30,14 @@ _BLOCK_SENTINEL_DATA = (b'\0' * _BLOCK_SENTINEL_LENGTH)
 _IS_BIG_ENDIAN = (__import__("sys").byteorder != 'little')
 _HEAD_MAGIC = b'Kaydara FBX Binary\x20\x20\x00\x1a\x00'
 
+# fbx has very strict CRC rules, all based on file timestamp
+# until we figure these out, write files at a fixed time. (workaround!)
+
+# Assumes: CreationTime
+_TIME_ID = b'1970-01-01 10:00:00:000'
+_FILE_ID = b'\x28\xb3\x2a\xeb\xb6\x24\xcc\xc2\xbf\xc8\xb0\x2a\xa9\x2b\xfc\xf1'
+_FOOT_ID = b'\xfa\xbc\xab\x09\xd0\xc8\xd4\x66\xb1\x76\xfb\x83\x1c\xf7\x26\x7e'
+
 
 class FBXElem:
     __slots__ = (
@@ -230,6 +238,33 @@ class FBXElem:
                 write(_BLOCK_SENTINEL_DATA)
 
 
+def _write_timedate_hack(elem_root):
+    # perform 2 changes
+    # - set the FileID
+    # - set the CreationTime
+
+    ok = 0
+    for elem in elem_root.elems:
+        if elem.id == b'CreationTime':
+            assert(elem.props_type[0] == b'S'[0])
+            assert(len(elem.props_type) == 1)
+            data = _TIME_ID
+            elem.props[0] = pack('<I', len(data)) + data
+            ok += 1
+
+        if elem.id == b'FileId':
+            assert(elem.props_type[0] == b'R'[0])
+            assert(len(elem.props_type) == 1)
+            data = _FILE_ID
+            elem.props[0] = pack('<I', len(data)) + data
+            ok += 1
+        if ok == 2:
+            break
+
+    if ok != 2:
+        print("Missing fields!")
+
+
 def write(fn, elem_root, version):
     assert(elem_root.id == b'')
 
@@ -240,17 +275,28 @@ def write(fn, elem_root, version):
         write(_HEAD_MAGIC)
         write(pack('<I', version))
 
+        # hack since we don't decode time.
+        # ideally we would _not_ modify this data.
+        _write_timedate_hack(elem_root)
+
         elem_root._calc_offsets_children(tell(), False)
         elem_root._write_children(write, tell, False)
-        write(pack('<I', 0))
 
-        # TODO: footer isn't working at the moment
-        write(b'\0' * 32)  # unknown, for alignment?
-        write(b'\xFA\xBC\xAB\x0E\xD7\xC1\xDD\x66\xB1\x77\xFA\x83\x1F\xFC\x28\x7B')  # wrong!
+        write(_FOOT_ID)
+        write(b'\0' * 4)
 
-        write(b'\0' * 13)  # unknown, for alignment?
+        # padding for alignment (values between 1 & 16 observed)
+        # if already aligned to 16, add a full 16 bytes padding.
+        ofs = tell()
+        pad = ((ofs + 15) & ~15) - ofs
+        if pad == 0:
+            pad = 16
+
+        write(b'\0' * pad)
 
         # this is correct (should be 16 bytes aligned though)!
         write(pack('<I', version))
+
+        # unknown magic (always the same)!
         write(b'\0' * 120)
-        write(b'\xf8\x5a\x8c\x6a')  # unknown magic (always the same)!
+        write(b'\xF8\x5A\x8C\x6A\xDE\xF5\xD9\x7E\xEC\xE9\x0C\xE3\x75\x8F\x29\x0B')
