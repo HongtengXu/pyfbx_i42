@@ -14,7 +14,7 @@ Text-Based File Structure
 -------------------------
 
 Knowledge of the text-based format is relevant for this document, so here is a quick writeup.
-The core hierarchical building block (object) of a text-based FBX document is
+The core hierarchical building block (node) of a text-based FBX document is
 
     ::
 
@@ -28,14 +28,14 @@ The core hierarchical building block (object) of a text-based FBX document is
            ...
         }
 
-In other words, a document is essentially a nested list.
-Each item has...
+In other words, a document is essentially a nested list of nodes.
+Each node has...
 
 * A NodeType identifier (class name)
 * A tuple of properties associated with it, the tuple elements are the usual primitive data types: ``float, integer, string`` etc.
-* A list which contains data in the same format (recursively).
+* A list which contains nodes in the same format (recursively).
 
-At global level, there is an "implicit dictionary" (i.e. the curly braces, the property list and the name are omitted)
+At global level, there is an "implicit list" (i.e. the curly braces, the property list and the name are omitted)
 with some standard nodes defined. Each of these standard items consists only of a nested list,
 so a file might look like this
 
@@ -67,7 +67,7 @@ Unlike for the text file format, this is not omitted - a full object record *wit
 After that record (which recursively contains the entire file information) there is a footer with unknown contents.
 
 
-Object Record Format
+Node Record Format
 --------------------
 
 A named object record has the following memory layout:
