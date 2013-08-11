@@ -14,7 +14,7 @@ Text-Based File Structure
 -------------------------
 
 Knowledge of the text-based format is relevant for this document, so here is a quick writeup.
-The core hierarchical building block (object) of a text-based FBX document is
+The core hierarchical building block (node) of a text-based FBX document is
 
     ::
 
@@ -28,14 +28,14 @@ The core hierarchical building block (object) of a text-based FBX document is
            ...
         }
 
-In other words, a document is essentially a nested list.
-Each item has...
+In other words, a document is essentially a nested list of nodes.
+Each node has...
 
 * A NodeType identifier (class name)
 * A tuple of properties associated with it, the tuple elements are the usual primitive data types: ``float, integer, string`` etc.
-* A list which contains data in the same format (recursively).
+* A list which contains nodes in the same format (recursively).
 
-At global level, there is an "implicit dictionary" (i.e. the curly braces, the property list and the name are omitted)
+At global level, there is an "implicit list" (i.e. the curly braces, the property list and the name are omitted)
 with some standard nodes defined. Each of these standard items consists only of a nested list,
 so a file might look like this
 
@@ -62,15 +62,15 @@ The first 27 bytes contain the header.
 
 
 Directly after this data, there is the top-level object record.
-Unlike for the text file format, this is not omitted - a full object record *with empty name and empty property list* is written.
+Unlike for the text file format, this is not omitted - a full node record *with empty name and empty property list* is written.
 
 After that record (which recursively contains the entire file information) there is a footer with unknown contents.
 
 
-Object Record Format
+Node Record Format
 --------------------
 
-A named object record has the following memory layout:
+A named node record has the following memory layout:
 
     ============    =========        ====
     Size (Bytes)    Data Type        Name
@@ -98,7 +98,7 @@ Where...
 * ``Property[n]`` is the ``n``'th property. For the format, see section *Property Record Format*. Properties are written sequentially and with no padding.
 * ``NestedList`` is the nested list, presence of which is indicated by a ``NULL``-*record* at the very end.
 
-Reading an object record up to and including the properties is straightforward.
+Reading a node record up to and including the properties is straightforward.
 To determine whether a nested list entry exists, check if there is bytes left until the ``EndOffset`` is reached.
 If so, recursively read an object record directly following the last property. Behind that object record,
 there is 13 zero bytes, which should then match up with the `EndOffset`.
@@ -139,7 +139,7 @@ where ``TypeCode`` can be one of the following character codes, which are ordere
     * ``l``: Array of 8 byte signed Integer
     * ``i``: Array of 4 byte signed Integer
 
-For array types (second group), ``Data`` is more complex:
+For array types, ``Data`` is more complex:
 
     ============    =========        ====
     Size (Bytes)    Data Type        Name
@@ -154,7 +154,7 @@ If ``Encoding`` is 0, the ``Contents`` is just ``ArrayLength`` times the array d
 the ``Contents`` is a deflate/zip-compressed buffer of length ``CompressedLength`` bytes.
 The buffer can for example be decoded using zlib.
 
-**Values other than 0,1 for ``Encoding`` have not been observed**.
+Values other than 0,1 for ``Encoding`` have not been observed.
 
 **iii)** Special types
 
