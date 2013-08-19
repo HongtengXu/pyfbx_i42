@@ -138,6 +138,7 @@ where ``TypeCode`` can be one of the following character codes, which are ordere
     * ``d``: Array of 8 byte double-precision IEEE 754 number
     * ``l``: Array of 8 byte signed Integer
     * ``i``: Array of 4 byte signed Integer
+    * ``b``: Array of 1 byte Booleans (always 0 or 1)
 
 For array types, ``Data`` is more complex:
 
@@ -172,8 +173,3 @@ Both of these have the following interpretation:
     ============    =========        ====
 
 The string is not zero-terminated, and may well contain ``\0`` characters (this is actually used in some FBX properties).
-
-
-**iv)** Unknown types
-
-    * ``b``: ???
