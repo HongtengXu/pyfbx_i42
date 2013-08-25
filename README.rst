@@ -17,9 +17,7 @@ What Works
 
 What Doesn't Work
 -----------------
-- ASCII FBX
-- The data type 'b',
-  *(aparently nobody knows what this is for, need to investigate)*.
+- ASCII FBX.  Currently the only workaround is to use ``fbxconvert`` to get a binary version.
 
 
 Examples
