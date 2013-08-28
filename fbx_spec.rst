@@ -139,6 +139,7 @@ where ``TypeCode`` can be one of the following character codes, which are ordere
     * ``l``: Array of 8 byte signed Integer
     * ``i``: Array of 4 byte signed Integer
     * ``b``: Array of 1 byte Booleans (always 0 or 1)
+    * ``c``: Array of 1 byte Integer
 
 For array types, ``Data`` is more complex:
 

@@ -90,7 +90,8 @@ read_data_dict = {
     b'i'[0]: lambda read: unpack_array(read, 'i', 4, True),   # array (int)
     b'd'[0]: lambda read: unpack_array(read, 'd', 8, False),  # array (double)
     b'l'[0]: lambda read: unpack_array(read, 'q', 8, True),   # array (long)
-    b'b'[0]: lambda read: unpack_array(read, 'b', 1, False),  # bool array
+    b'b'[0]: lambda read: unpack_array(read, 'b', 1, False),  # array (bool)
+    b'c'[0]: lambda read: unpack_array(read, 'B', 1, False),  # array (ubyte)
     }
 
 

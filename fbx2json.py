@@ -59,6 +59,7 @@ The types are as follows:
 * 'd': - FLOAT64_ARRAY
 * 'l': - INT64_ARRAY
 * 'b': - BOOL ARRAY
+* 'c': - BYTE ARRAY
 
 Note that key:value pairs aren't used since the id's are not
 ensured to be unique.
@@ -131,7 +132,8 @@ read_data_dict = {
     b'i'[0]: lambda read: unpack_array(read, 'i', 4, True),   # array (int)
     b'd'[0]: lambda read: unpack_array(read, 'd', 8, False),  # array (double)
     b'l'[0]: lambda read: unpack_array(read, 'q', 8, True),   # array (long)
-    b'b'[0]: lambda read: unpack_array(read, 'b', 1, False),  # bool array
+    b'b'[0]: lambda read: unpack_array(read, 'b', 1, False),  # array (bool)
+    b'c'[0]: lambda read: unpack_array(read, 'B', 1, False),  # array (ubyte)
     }
 
 
@@ -227,6 +229,7 @@ INT32_ARRAY = b'i'[0],
 FLOAT64_ARRAY = b'd'[0],
 INT64_ARRAY = b'l'[0],
 BOOL_ARRAY = b'b'[0],
+BYTE_ARRAY = b'c'[0],
 ))
 
 # pyfbx.parse_bin
