@@ -176,13 +176,22 @@ class FBXElem:
         self._props_length = props_length
         offset += props_length
 
+        offset = self._calc_offsets_children(offset)
+
+        self._end_offset = offset
+        return offset
+
+    def _calc_offsets_children(self, offset):
         if self.elems:
             for elem in self.elems:
                 offset = elem._calc_offsets(offset)
             offset += _BLOCK_SENTINEL_LENGTH
+        elif not self.props:
+            offset += _BLOCK_SENTINEL_LENGTH
 
-        self._end_offset = offset
+
         return offset
+
 
     def _write(self, write, tell):
         assert(self._end_offset != -1)
@@ -198,16 +207,20 @@ class FBXElem:
             write(bytes((self.props_type[i],)))
             write(data)
 
+        self._write_children(write, tell)
+
+        if tell() != self._end_offset:
+            raise IOError("scope length not reached, "
+                          "something is wrong (%d)" % (end_offset - tell()))
+
+    def _write_children(self, write, tell):
         if self.elems:
             for elem in self.elems:
                 assert(elem.id != b'')
                 elem._write(write, tell)
             write(_BLOCK_SENTINEL_DATA)
-
-
-        if tell() != self._end_offset:
-            raise IOError("scope length not reached, "
-                          "something is wrong (%d)" % (end_offset - tell()))
+        elif not self.props:
+            write(_BLOCK_SENTINEL_DATA)
 
 
 def write(fn, elem_root, version):
@@ -220,8 +233,7 @@ def write(fn, elem_root, version):
         write(_HEAD_MAGIC)
         write(pack('<I', version))
 
-        elem_root._calc_offsets(tell())
-        elem_root._write(write, tell)
+        elem_root._calc_offsets_children(tell())
+        elem_root._write_children(write, tell)
         write(pack('<I', 0))
-
 
