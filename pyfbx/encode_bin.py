@@ -23,6 +23,7 @@
 from . import data_types
 from struct import pack
 import array
+import zlib
 
 _BLOCK_SENTINEL_LENGTH = 13
 _BLOCK_SENTINEL_DATA = (b'\0' * _BLOCK_SENTINEL_LENGTH)
@@ -125,10 +126,11 @@ class FBXElem:
             data.byteswap()
         data = data.tobytes()
 
+        encoding = 0 if len(data) <= 128 else 1
         if encoding == 0:
             pass
         elif encoding == 1:
-            data = zlib.compress(data, 9)
+            data = zlib.compress(data, 1)
 
         comp_len = len(data)
 
@@ -158,7 +160,7 @@ class FBXElem:
     # -------------------------
     # internal helper functions
 
-    def _calc_offsets(self, offset):
+    def _calc_offsets(self, offset, last):
         """
         Call before writing, calculates fixed offsets.
         """
@@ -176,24 +178,26 @@ class FBXElem:
         self._props_length = props_length
         offset += props_length
 
-        offset = self._calc_offsets_children(offset)
+        offset = self._calc_offsets_children(offset, last)
 
         self._end_offset = offset
         return offset
 
-    def _calc_offsets_children(self, offset):
+    def _calc_offsets_children(self, offset, last):
         if self.elems:
             for elem in self.elems:
-                offset = elem._calc_offsets(offset)
+                offset = elem._calc_offsets(offset, elem is self.elems[-1])
             offset += _BLOCK_SENTINEL_LENGTH
         elif not self.props:
-            offset += _BLOCK_SENTINEL_LENGTH
+            if not last:
+                offset += _BLOCK_SENTINEL_LENGTH
+
 
 
         return offset
 
 
-    def _write(self, write, tell):
+    def _write(self, write, tell, last):
         assert(self._end_offset != -1)
         assert(self._props_length != -1)
 
@@ -207,20 +211,21 @@ class FBXElem:
             write(bytes((self.props_type[i],)))
             write(data)
 
-        self._write_children(write, tell)
+        self._write_children(write, tell, last)
 
         if tell() != self._end_offset:
             raise IOError("scope length not reached, "
                           "something is wrong (%d)" % (end_offset - tell()))
 
-    def _write_children(self, write, tell):
+    def _write_children(self, write, tell, last):
         if self.elems:
             for elem in self.elems:
                 assert(elem.id != b'')
-                elem._write(write, tell)
+                elem._write(write, tell, elem is self.elems[-1])
             write(_BLOCK_SENTINEL_DATA)
         elif not self.props:
-            write(_BLOCK_SENTINEL_DATA)
+            if not last:
+                write(_BLOCK_SENTINEL_DATA)
 
 
 def write(fn, elem_root, version):
@@ -233,7 +238,17 @@ def write(fn, elem_root, version):
         write(_HEAD_MAGIC)
         write(pack('<I', version))
 
-        elem_root._calc_offsets_children(tell())
-        elem_root._write_children(write, tell)
+        elem_root._calc_offsets_children(tell(), False)
+        elem_root._write_children(write, tell, False)
         write(pack('<I', 0))
 
+        # TODO: footer isn't working at the moment
+        write(b'\0' * 32)  # unknown, for alignment?
+        write(b'\xFA\xBC\xAB\x0E\xD7\xC1\xDD\x66\xB1\x77\xFA\x83\x1F\xFC\x28\x7B')  # wrong!
+
+        write(b'\0' * 13)  # unknown, for alignment?
+
+        # this is correct (should be 16 bytes aligned though)!
+        write(pack('<I', version))
+        write(b'\0' * 120)
+        write(b'\xf8\x5a\x8c\x6a')  # unknown magic (always the same)!
