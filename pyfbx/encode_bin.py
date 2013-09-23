@@ -115,7 +115,7 @@ class FBXElem:
         self.props_type.append(data_types.STRING)
         self.props.append(data)
 
-    def _add_array_helper(self, data, array_type, prop_type, encoding):
+    def _add_array_helper(self, data, array_type, prop_type):
         assert(isinstance(data, array.array))
         assert(data.typecode == array_type)
 
@@ -126,6 +126,9 @@ class FBXElem:
             data.byteswap()
         data = data.tobytes()
 
+        # mimic behavior of fbxconverter (also common sense)
+        # using compression 1 also matches fbxconverter.
+        # we could make this configurable.
         encoding = 0 if len(data) <= 128 else 1
         if encoding == 0:
             pass
@@ -139,23 +142,23 @@ class FBXElem:
         self.props_type.append(prop_type)
         self.props.append(data)
 
-    def add_int32_array(self, data, encoding=0):
-        self._add_array_helper(data, 'i', data_types.INT32_ARRAY, encoding)
+    def add_int32_array(self, data):
+        self._add_array_helper(data, 'i', data_types.INT32_ARRAY)
 
-    def add_int64_array(self, data, encoding=0):
-        self._add_array_helper(data, 'q', data_types.INT64_ARRAY, encoding)
+    def add_int64_array(self, data):
+        self._add_array_helper(data, 'q', data_types.INT64_ARRAY)
 
-    def add_float32_array(self, data, encoding=0):
-        self._add_array_helper(data, 'f', data_types.FLOAT32_ARRAY, encoding)
+    def add_float32_array(self, data):
+        self._add_array_helper(data, 'f', data_types.FLOAT32_ARRAY)
 
-    def add_float64_array(self, data, encoding=0):
-        self._add_array_helper(data, 'd', data_types.FLOAT64_ARRAY, encoding)
+    def add_float64_array(self, data):
+        self._add_array_helper(data, 'd', data_types.FLOAT64_ARRAY)
 
-    def add_bool_array(self, data, encoding=0):
-        self._add_array_helper(data, 'b', data_types.BOOL_ARRAY, encoding)
+    def add_bool_array(self, data):
+        self._add_array_helper(data, 'b', data_types.BOOL_ARRAY)
 
-    def add_byte_array(self, data, encoding=0):
-        self._add_array_helper(data, 'B', data_types.BYTE_ARRAY, encoding)
+    def add_byte_array(self, data):
+        self._add_array_helper(data, 'B', data_types.BYTE_ARRAY)
 
     # -------------------------
     # internal helper functions

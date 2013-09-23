@@ -21,17 +21,17 @@
 # Script copyright (C) 2006-2012, assimp team
 # Script copyright (C) 2013 Blender Foundation
 
-INT16 = b'Y'[0]
 BOOL = b'C'[0]
+INT16 = b'Y'[0]
 INT32 = b'I'[0]
+INT64 = b'L'[0]
 FLOAT32 = b'F'[0]
 FLOAT64 = b'D'[0]
-INT64 = b'L'[0]
 BYTES = b'R'[0]
 STRING = b'S'[0]
-FLOAT32_ARRAY = b'f'[0]
 INT32_ARRAY = b'i'[0]
-FLOAT64_ARRAY = b'd'[0]
 INT64_ARRAY = b'l'[0]
+FLOAT32_ARRAY = b'f'[0]
+FLOAT64_ARRAY = b'd'[0]
 BOOL_ARRAY = b'b'[0]
 BYTE_ARRAY = b'c'[0]
