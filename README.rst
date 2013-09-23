@@ -19,7 +19,7 @@ What Works
   *(parsing data seems not to depend on exact versions)*.
 - all known datatypes (float/int arrays, loading binary data, strings etc).
 - zlib compression.
-- parsing and re-encoding and FBX file. *See ``tests/reencode.py``*
+- parsing and re-encoding and FBX file. See: ``tests/reencode.py``
 
 
 What Doesn't Work
