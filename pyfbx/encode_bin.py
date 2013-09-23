@@ -163,7 +163,7 @@ class FBXElem:
     # -------------------------
     # internal helper functions
 
-    def _calc_offsets(self, offset, last):
+    def _calc_offsets(self, offset, is_last):
         """
         Call before writing, calculates fixed offsets.
         """
@@ -181,30 +181,28 @@ class FBXElem:
         self._props_length = props_length
         offset += props_length
 
-        offset = self._calc_offsets_children(offset, last)
+        offset = self._calc_offsets_children(offset, is_last)
 
         self._end_offset = offset
         return offset
 
-    def _calc_offsets_children(self, offset, last):
+    def _calc_offsets_children(self, offset, is_last):
         if self.elems:
+            elem_last = self.elems[-1]
             for elem in self.elems:
-                offset = elem._calc_offsets(offset, elem is self.elems[-1])
+                offset = elem._calc_offsets(offset, (elem is elem_last))
             offset += _BLOCK_SENTINEL_LENGTH
         elif not self.props:
-            if not last:
+            if not is_last:
                 offset += _BLOCK_SENTINEL_LENGTH
-
-
 
         return offset
 
-
-    def _write(self, write, tell, last):
+    def _write(self, write, tell, is_last):
         assert(self._end_offset != -1)
         assert(self._props_length != -1)
 
-        print(self.id, self._end_offset, len(self.props), self._props_length)
+        # print(self.id, self._end_offset, len(self.props), self._props_length)
         write(pack('<3I', self._end_offset, len(self.props), self._props_length))
 
         write(bytes((len(self.id),)))
@@ -214,20 +212,21 @@ class FBXElem:
             write(bytes((self.props_type[i],)))
             write(data)
 
-        self._write_children(write, tell, last)
+        self._write_children(write, tell, is_last)
 
         if tell() != self._end_offset:
             raise IOError("scope length not reached, "
                           "something is wrong (%d)" % (end_offset - tell()))
 
-    def _write_children(self, write, tell, last):
+    def _write_children(self, write, tell, is_last):
         if self.elems:
+            elem_last = self.elems[-1]
             for elem in self.elems:
                 assert(elem.id != b'')
-                elem._write(write, tell, elem is self.elems[-1])
+                elem._write(write, tell, (elem is elem_last))
             write(_BLOCK_SENTINEL_DATA)
         elif not self.props:
-            if not last:
+            if not is_last:
                 write(_BLOCK_SENTINEL_DATA)
 
 
