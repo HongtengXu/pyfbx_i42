@@ -135,7 +135,6 @@ class FBXElem:
         data = data.tobytes()
 
         # mimic behavior of fbxconverter (also common sense)
-        # using compression 1 also matches fbxconverter.
         # we could make this configurable.
         encoding = 0 if len(data) <= 128 else 1
         if encoding == 0:
@@ -245,19 +244,19 @@ def _write_timedate_hack(elem_root):
 
     ok = 0
     for elem in elem_root.elems:
-        if elem.id == b'CreationTime':
-            assert(elem.props_type[0] == b'S'[0])
-            assert(len(elem.props_type) == 1)
-            data = _TIME_ID
-            elem.props[0] = pack('<I', len(data)) + data
-            ok += 1
-
         if elem.id == b'FileId':
             assert(elem.props_type[0] == b'R'[0])
             assert(len(elem.props_type) == 1)
             data = _FILE_ID
             elem.props[0] = pack('<I', len(data)) + data
             ok += 1
+        elif elem.id == b'CreationTime':
+            assert(elem.props_type[0] == b'S'[0])
+            assert(len(elem.props_type) == 1)
+            data = _TIME_ID
+            elem.props[0] = pack('<I', len(data)) + data
+            ok += 1
+
         if ok == 2:
             break
 
@@ -294,9 +293,8 @@ def write(fn, elem_root, version):
 
         write(b'\0' * pad)
 
-        # this is correct (should be 16 bytes aligned though)!
         write(pack('<I', version))
 
-        # unknown magic (always the same)!
+        # unknown magic (always the same)
         write(b'\0' * 120)
         write(b'\xF8\x5A\x8C\x6A\xDE\xF5\xD9\x7E\xEC\xE9\x0C\xE3\x75\x8F\x29\x0B')
