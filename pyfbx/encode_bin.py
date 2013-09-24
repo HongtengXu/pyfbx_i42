@@ -286,7 +286,7 @@ def write(fn, elem_root, version):
         elem_root._write_children(write, tell, False)
 
         write(_FOOT_ID)
-        write(b'\0' * 4)
+        write(b'\x00' * 4)
 
         # padding for alignment (values between 1 & 16 observed)
         # if already aligned to 16, add a full 16 bytes padding.
@@ -301,4 +301,4 @@ def write(fn, elem_root, version):
 
         # unknown magic (always the same)
         write(b'\0' * 120)
-        write(b'\xF8\x5A\x8C\x6A\xDE\xF5\xD9\x7E\xEC\xE9\x0C\xE3\x75\x8F\x29\x0B')
+        write(b'\xf8\x5a\x8c\x6a\xde\xf5\xd9\x7e\xec\xe9\x0c\xe3\x75\x8f\x29\x0b')
