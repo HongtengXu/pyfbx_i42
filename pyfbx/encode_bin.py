@@ -247,14 +247,18 @@ def _write_timedate_hack(elem_root):
         if elem.id == b'FileId':
             assert(elem.props_type[0] == b'R'[0])
             assert(len(elem.props_type) == 1)
-            data = _FILE_ID
-            elem.props[0] = pack('<I', len(data)) + data
+            elem.props.clear()
+            elem.props_type.clear()
+
+            elem.add_bytes(_FILE_ID)
             ok += 1
         elif elem.id == b'CreationTime':
             assert(elem.props_type[0] == b'S'[0])
             assert(len(elem.props_type) == 1)
-            data = _TIME_ID
-            elem.props[0] = pack('<I', len(data)) + data
+            elem.props.clear()
+            elem.props_type.clear()
+
+            elem.add_string(_TIME_ID)
             ok += 1
 
         if ok == 2:
