@@ -2,7 +2,8 @@ pyfbx_i42
 =========
 
 Currently this project contains ``pyfbx/parse_bin.py``,
-a simple but functional parser for binary FBX data, which can load in the FBX hierarchy.
+a simple but functional parser for binary FBX data written for Python3,
+which can load in the FBX hierarchy.
 
 To create binary FBX files ``pyfbx/encode_bin.py``
 a simple module to support writing FBX files.
