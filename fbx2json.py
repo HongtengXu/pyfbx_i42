@@ -297,7 +297,7 @@ def fbx2json(fn):
     fbx_root_elem, fbx_version = parse(fn, use_namedtuple=True)
     print("(Version %d) ..." % fbx_version)
 
-    with open(fn_json, 'w', encoding="ascii", errors='xmlcharrefreplace') as f:
+    with open(fn_json, 'w', encoding="utf8", errors='xmlcharrefreplace') as f:
         fw = f.write
         fw('[\n')
         ident_sub = "    "
