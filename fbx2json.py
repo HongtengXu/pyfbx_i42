@@ -167,7 +167,8 @@ def read_elem(read, tell, use_namedtuple):
                           "expected all bytes to be 0")
 
     if tell() != end_offset:
-        raise IOError("scope length not reached, something is wrong")
+        raise IOError("scope length not reached, "
+                      "something is wrong (%d)" % (end_offset - tell()))
 
     args = (elem_id, elem_props_data, elem_props_type, elem_subtree)
     return FBXElem(*args) if use_namedtuple else args
