@@ -134,7 +134,7 @@ read_data_dict = {
     b'l'[0]: lambda read: unpack_array(read, 'q', 8, True),   # array (long)
     b'b'[0]: lambda read: unpack_array(read, 'b', 1, False),  # array (bool)
     b'c'[0]: lambda read: unpack_array(read, 'B', 1, False),  # array (ubyte)
-    }
+}
 
 
 def read_elem(read, tell, use_namedtuple):
@@ -216,29 +216,29 @@ def parse(fn, use_namedtuple=True):
 # pyfbx.data_types
 data_types = type(array)("data_types")
 data_types.__dict__.update(
-dict(
-INT16 = b'Y'[0],
-BOOL = b'C'[0],
-INT32 = b'I'[0],
-FLOAT32 = b'F'[0],
-FLOAT64 = b'D'[0],
-INT64 = b'L'[0],
-BYTES = b'R'[0],
-STRING = b'S'[0],
-FLOAT32_ARRAY = b'f'[0],
-INT32_ARRAY = b'i'[0],
-FLOAT64_ARRAY = b'd'[0],
-INT64_ARRAY = b'l'[0],
-BOOL_ARRAY = b'b'[0],
-BYTE_ARRAY = b'c'[0],
-))
+    dict(
+        INT16=b'Y'[0],
+        BOOL=b'C'[0],
+        INT32=b'I'[0],
+        FLOAT32=b'F'[0],
+        FLOAT64=b'D'[0],
+        INT64=b'L'[0],
+        BYTES=b'R'[0],
+        STRING=b'S'[0],
+        FLOAT32_ARRAY=b'f'[0],
+        INT32_ARRAY=b'i'[0],
+        FLOAT64_ARRAY=b'd'[0],
+        INT64_ARRAY=b'l'[0],
+        BOOL_ARRAY=b'b'[0],
+        BYTE_ARRAY=b'c'[0],
+    ))
 
 # pyfbx.parse_bin
 parse_bin = type(array)("parse_bin")
 parse_bin.__dict__.update(
-dict(
-parse = parse
-))
+    dict(
+        parse=parse
+    ))
 
 
 # ----------------------------------------------------------------------------

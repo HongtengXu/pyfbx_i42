@@ -48,7 +48,7 @@ class FBXElem:
 
         "_props_length",  # combine length of props
         "_end_offset",  # byte offset from the start of the file.
-        )
+    )
 
     def __init__(self, id):
         assert(len(id) < 256)  # length must fit in a uint8

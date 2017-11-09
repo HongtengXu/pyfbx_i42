@@ -25,7 +25,7 @@ __all__ = (
     "parse",
     "parse_version",
     "FBXElem",
-    )
+)
 
 from struct import unpack
 import array
@@ -92,7 +92,7 @@ read_data_dict = {
     b'l'[0]: lambda read: unpack_array(read, 'q', 8, True),   # array (long)
     b'b'[0]: lambda read: unpack_array(read, 'b', 1, False),  # array (bool)
     b'c'[0]: lambda read: unpack_array(read, 'B', 1, False),  # array (ubyte)
-    }
+}
 
 
 def read_elem(read, tell, use_namedtuple):
