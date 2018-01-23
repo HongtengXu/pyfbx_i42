@@ -117,7 +117,7 @@ class FBXElem:
 
     def add_string_unicode(self, data):
         assert(isinstance(data, str))
-        data = data.decode('utf8')
+        data = data.encode('utf8')
         data = pack('<I', len(data)) + data
 
         self.props_type.append(data_types.STRING)
